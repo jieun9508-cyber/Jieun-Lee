@@ -45,4 +45,10 @@ class RPSGame :
             if again.lower() != 'y' :
                 break
 
-RPSGame().play()
+while True :
+    game = RPSGame()
+    RPSGame().play()
+    again = input("다시 하시겠습니까? (y/n): ").strip().lower()
+    if again != 'y' :
+        print("게임을 종료합니다")
+        break

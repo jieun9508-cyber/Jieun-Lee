@@ -18,7 +18,6 @@
 1. 
 # n = list(map(int, input().split()))
 # print(min(n))
-# print(max(n))
+# print(max(n)
 
-
-n = 12
+result = []
