@@ -36,9 +36,16 @@ class NumberGuessingGame:
             print(f"정답입니다! {self.attempts}번 만에 맞추셨습니다.")
             return True
 
-    def play(self):
-        print("숫자 맞추기 게임에 오신 것을 환영합니다!")
-        while True:
-            user_guess = self.get_user_guess()
-            if self.check_guess(user_guess):
+game = NumberGuessingGame()
+while True:
+    try:
+        user_input = int(input("1부터 100 사이의 숫자를 입력하세요: "))
+        if 1 <= user_input <= 100:
+            result = game.guess(user_input)
+            print(result)
+            if result.startswith("정답입니다"):
                 break
+        else:
+            print("1부터 100 사이의 숫자를 입력하세요.")
+    except ValueError:
+        print("유효한 숫자를 입력하세요.")        
