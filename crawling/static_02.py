@@ -11,17 +11,17 @@ from_data = {
 response = requests.post(url,data=from_data)
 
 # 터미널에서 pip install beautifulsoup4 실행
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup   # BeautifulSoup : 잘못된 HTML을 수정하여 쉽게 탐색 가능하게 함
 #  response 에 있는 문자열로 된 데이터를 BeautifulSoup 객체로 변환
-soup = BeautifulSoup(response.text,'html.parser')
-
+soup = BeautifulSoup(response.text,'html.parser')  # (객체 근간이 되는 HTML 텍스트, BeautifulSoup가 객체를 만들 때 쓰는 구문 분석기)
+# 구문 분석기의 경우 'lxml', 'html.parser'등 사용자가 원하는 걸 지정해서 사용할 수 있음
 # 원하는 정보를 추출
 #  #contents > div.content > fieldset > fieldset > div.tableType01 > table > tbody > tr
 str_table_rows = '#contents > div.content > fieldset > fieldset > div.tableType01 > table > tbody > tr'
 # soup.select('tbody > tr')  tbody가 한개 밖에 없어서 가능 만약 여러개면 가장 먼저 만나는 tbody
-sotre_rows = soup.select(str_table_rows)
+store_rows = soup.select(str_table_rows)
 store_lists = []
-for row in sotre_rows:        
+for row in store_rows:        
     store_lists.append(
         (
             row.select('td')[0].text.strip(),

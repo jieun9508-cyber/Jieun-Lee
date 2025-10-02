@@ -2,12 +2,12 @@
 # pip install dotenv  # 환경변수 .env를 로드할수 있는 라이브러리
 import pymysql
 from dotenv import load_dotenv
-import os
+import os  #환경변수 읽을 수 있게 함
 # .env 로드
 load_dotenv()
 
 # 1. DB 연결
-def get_connection():
+def get_connection():  #연결한 DB 설정값 지정해서 connection 함수 정의
     return pymysql.connect(
         host = os.getenv('DB_HOST'),
         user = os.getenv('DB_USER'),
@@ -16,13 +16,13 @@ def get_connection():
     )
 
 import crawlingcoffee
-with get_connection() as conn:
-    with conn.cursor() as cur:
-        sql = '''
-            insert into shop_base_tbl
-	            values(null,%s,%s,%s,%s,%s)
-            '''
-        # cur.execute(sql,( , , , ,  )  )
-        cur.executemany(sql,crawlingcoffee.get_data())  # row를 구성하는 튜플들의 리스트
-    conn.commit()
-    
+for page_num in range(1,47):
+    with get_connection() as conn:
+        with conn.cursor() as cur: #cur : 명령시키는 함수
+            sql = '''
+                insert into shop_base_tbl
+                    values(null,%s,%s,%s,%s,%s)
+                '''
+            # cur.execute(sql,( , , , ,  )  )
+            cur.executemany(sql,crawlingcoffee.get_data(page_num))  # row를 구성하는 튜플들의 리스트
+        conn.commit()  

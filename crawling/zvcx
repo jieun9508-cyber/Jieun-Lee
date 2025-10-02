@@ -1,0 +1,54 @@
+# kia_ev_faq_static.py
+import requests, pandas as pd
+from bs4 import BeautifulSoup
+
+URL = "https://www.kia.com/kr/vehicles/kia-ev/guide/faq"
+HDRS = {"User-Agent": "Mozilla/5.0 (compatible; EV-FAQ-Bot/1.0)"}
+
+def norm(s: str) -> str:
+    return " ".join((s or "").split())
+
+def scrape():
+    res = requests.get(URL, headers=HDRS, timeout=30)
+    res.raise_for_status()
+    soup = BeautifulSoup(res.text, "html.parser")
+
+    containers = soup.select(
+        'section[class*="faq"], div[class*="faq"], section[class*="accordion"], div[class*="accordion"]'
+    )
+    if not containers:
+        containers = [soup]
+
+    items = []
+    for root in containers:
+        cards = root.select("li, div")
+        for c in cards:
+            q_el = c.select_one(
+                '.question, .faq-q, .accordion__header, .accordion-header, h3, h4, dt, button[aria-expanded]'
+            )
+            a_el = c.select_one(
+                '.answer, .faq-a, .accordion__body, .accordion-body, p, dd'
+            )
+            q = norm(q_el.get_text()) if q_el else ""
+            a = norm(a_el.get_text()) if a_el else ""
+            if q and a and q != a:
+                items.append({"brand":"KIA","category":"EV_FAQ","q":q,"a":a,"url":URL})
+
+    # dl 백업
+    if not items:
+        for dl in soup.select("dl"):
+            dts = dl.select("dt")
+            dds = dl.select("dd")
+            for dt, dd in zip(dts, dds):
+                q = norm(dt.get_text())
+                a = norm(dd.get_text())
+                if q and a and q != a:
+                    items.append({"brand":"KIA","category":"EV_FAQ","q":q,"a":a,"url":URL})
+
+    return items
+
+if __name__ == "__main__":
+    rows = scrape()
+    df = pd.DataFrame(rows).drop_duplicates(subset=["q","a"])
+    print("collected:", len(df))
+    df.to_csv("kia_ev_faq.csv", index=False, encoding="utf-8-sig")
